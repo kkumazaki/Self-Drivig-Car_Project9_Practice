@@ -16,7 +16,7 @@ class LookAway(object):
 
 		self.sub1 = rospy.Subscriber('/simple_arm/joint_states', JointState, self.joint_states_callback)
 		self.sub2 = rospy.Subscriber('/rgb_camera/image_raw', Image, self.look_away_callback)
-		self.safe_move = rospy.ServiceProxy('/arm_mover/safe_mover', GoToPosition)
+		self.safe_move = rospy.ServiceProxy('/arm_mover/safe_move', GoToPosition)
 
 		rospy.spin()
 
@@ -24,7 +24,7 @@ class LookAway(object):
 		return all(value == image[0] for value in image)
 
 	def coord_equal(self, coord_1, coord_2):
-		if coord_1 is None or coord2 is None:
+		if coord_1 is None or coord_2 is None:
 			return False
 		tolerance = 0.0005
 		result = abs(coord_1[0] - coord_2[0]) <= abs(tolerance)
@@ -39,7 +39,7 @@ class LookAway(object):
 			self.arm_moving = True
 
 	def look_away_callback(self, data):
-		if not self.arm_moving- and self.uniform_image(data.data):
+		if not self.arm_moving and self.uniform_image(data.data):
 			try:
 				rospy.wait_for_service('/arm_mover/safe_move')
 				msg = GoToPositionRequest()
